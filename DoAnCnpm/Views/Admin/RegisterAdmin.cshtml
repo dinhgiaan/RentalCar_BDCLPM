@@ -1,0 +1,38 @@
+﻿@model DoAnCnpm.Models.Admin
+
+@{
+    ViewBag.Title = "RegisterAdmin";
+    Layout = "~/Views/Shared/Adminlayout.cshtml";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+    }
+</style>
+
+<h2>Đăng ký tài khoản Admin</h2>
+@using (Html.BeginForm("RegisterAdmin", "Admin", FormMethod.Post, new
+{
+    enctype = "multipart/form-data"
+}))
+{
+    @Html.AntiForgeryToken()
+
+    if (ViewBag.ErrorRegister != null)
+    {
+        <p>@ViewBag.ErrorRegister</p>
+    }
+
+    <p>Nhập Username:</p>
+    <p>@Html.EditorFor(model => model.Username)</p>
+    <p>@Html.ValidationMessageFor(model => model.Username)</p>
+
+    <p>Mật khẩu: </p>
+    <p>@Html.PasswordFor(model => model.Password)</p>
+    <p>@Html.ValidationMessageFor(model => model.Password)</p>
+
+
+
+    <input type="submit" value="Register" />
+}

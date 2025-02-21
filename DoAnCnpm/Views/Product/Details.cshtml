@@ -1,0 +1,151 @@
+﻿﻿@model DoAnCnpm.Models.Product
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/TrangDatXe.cshtml";
+}
+<link rel='stylesheet prefetch' href='https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css'>
+<link rel="stylesheet" href="~/Content/mystyle.css" />
+<link href="~/Content/productdetail.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+
+
+
+<div class="product-detail">
+    <div class="product-image">
+        <img src="@Url.Content(Model.ImagePro)" alt="">
+    </div>
+
+    <div class="product-info">
+        <div class="pro-name">
+            @Model.NamePro
+        </div>
+
+        <div class="pro-desc">
+            <span>Mô tả: </span>
+            @Model.DecriptionPro
+        </div>
+
+        <div class="pro-price">
+            <span>Giá: </span>
+            @Model.Price VNĐ
+        </div>
+
+        <a href="/ShoppingCart/AddToCart/@Model.ProductID" class="order-btn">
+            Thuê
+        </a>
+    </div>
+</div>
+
+<div class="comment" id="comment-section">
+    <h3 style="font-weight: bold;">Bình luận</h3>
+
+    @if (Session["UserCus"] != null)
+    {
+        <form id="comment-form">
+            @Html.HiddenFor(model => model.ProductID)
+            <div class="comment-head">
+                <div class="comment-form">
+                    <input id="comment"
+                           name="CommentMsg"
+                           type="text"
+                           class="form-control"
+                           placeholder=" @Session["UserCus"] hãy nhập bình luận của bạn...">
+                </div>
+
+                <div class="form-group">
+                    <div class="stars">
+                        <input class="star star-5" id="star-5" type="radio" name="star" value="5" />
+                        <label class="star star-5" for="star-5"></label>
+                        <input class="star star-4" id="star-4" type="radio" name="star" value="4" />
+                        <label class="star star-4" for="star-4"></label>
+                        <input class="star star-3" id="star-3" type="radio" name="star" value="3" />
+                        <label class="star star-3" for="star-3"></label>
+                        <input class="star star-2" id="star-2" type="radio" name="star" value="2" />
+                        <label class="star star-2" for="star-2"></label>
+                        <input class="star star-1" id="star-1" type="radio" name="star" value="1" />
+                        <label class="star star-1" for="star-1"></label>
+                    </div>
+                </div>
+
+                <button type="button" onclick="submitComment()" class="comment-btn">Gửi</button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <p>Vui lòng <a href="@Url.Action("Authen", "Login")">đăng nhập</a> hoặc <a href="@Url.Action("Register", "Login")">đăng ký</a> để bình luận sản phẩm.</p>
+    }
+    <div class="comment-list" id="comment-list">
+        <!-- Danh sách bình luận và đánh giá sẽ được cập nhật ở đây -->
+    </div>
+</div>
+
+<script>
+    var rate;
+
+    $(document).ready(function () {
+
+        $('.star').on('click', function () {
+            rate = $(this).val(); // Đặt biến rate thành giá trị xếp hạng đã chọn
+        });
+    });
+
+    function submitComment() {
+    var productId = $("#ProductID").val();
+    var commentMsg = $("#comment").val();
+    var userName = '@Session["UserCus"]'; // Lấy giá trị từ Session
+    var userID = '@Session["UserId"]';
+        console.log(userID)
+
+    // Gửi dữ liệu lên máy chủ
+    $.ajax({
+        url: "/Product/AddComment",
+        type: "POST",
+        data: {
+            ProductID: productId,
+            CommentMsg: commentMsg,
+            Rate: rate,
+            UserName: userName,
+            UserId: userID,
+        },
+        success: function () {
+            // Xóa nội dung của các trường sau khi gửi thành công
+            $("#comment").val("");
+            $("#rate").val("");
+
+            // Cập nhật danh sách bình luận và đánh giá
+            loadComments(productId);
+        },
+        error: function (xhr, status, error) {
+            // Hiển thị thông báo lỗi từ phản hồi máy chủ
+            var errorMessage = "Có lỗi xảy ra khi gửi bình luận" ;
+            alert(errorMessage);
+        }
+    });
+}
+
+
+
+    function loadComments(productId) {
+        // Gửi yêu cầu lấy danh sách bình luận và đánh giá
+        $.ajax({
+            url: "/Product/GetComments", // Đặt URL phù hợp với đường dẫn của phương thức trong Controller
+            type: "GET",
+            data: {
+                productId: productId
+            },
+            success: function (data) {
+                // Cập nhật danh sách bình luận và đánh giá
+                $("#comment-list").html(data);
+            },
+            error: function () {
+                console.log("Có lỗi xảy ra khi tải danh sách bình luận.");
+            }
+        });
+    }
+
+    // Gọi hàm để hiển thị danh sách bình luận khi trang được tải
+    var productId = $("#ProductID").val();
+    loadComments(productId);
+</script>

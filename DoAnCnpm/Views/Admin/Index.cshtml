@@ -1,0 +1,41 @@
+﻿@model DoAnCnpm.Models.Admin
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Adminlayout.cshtml";
+}
+
+
+<style>
+    .field-validation-error {
+        color: red;
+    }
+</style>
+<h2>Đăng nhập tài khoản Admin</h2>
+@using (Html.BeginForm("LoginAdmin", "Admin"))
+{
+    @Html.AntiForgeryToken()
+    <table>
+        <tr>
+            <td>Tài khoản Admin: </td>
+            <td>@Html.TextBoxFor(model => model.Username, new { style = "field-validation-error" })</td>
+            <td>@Html.ValidationMessageFor(model => model.Username)</td>
+        </tr>
+        <tr>
+            <td>Mật khẩu:</td>
+            <td>@Html.PasswordFor(model => model.Password)</td>
+            <td>@Html.ValidationMessageFor(model => model.Password)</td>
+            @if (ViewBag.ErrorInfo== null)
+            {
+              
+            }
+        </tr>
+        <tr>
+            <td></td>
+            <td><input type="submit" value="Login" /></td>
+        </tr>
+    </table>
+
+}
+
+
